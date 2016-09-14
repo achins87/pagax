@@ -101,7 +101,7 @@ pagax_modules.ajax = pagax_modules.ajax || {
                 }
 
                 if (response.hasOwnProperty("data")) {
-                    feed.callback_parameters.data = response.data;
+                    feed.callback_parameters.response = response;
                 } else {
                     feed.callback_parameters["data"] = {
                         title : "",
@@ -114,7 +114,7 @@ pagax_modules.ajax = pagax_modules.ajax || {
                         if (response.hasOwnProperty("data") && (response.data.hasOwnProperty("redirect") || response.data.hasOwnProperty("refresh"))) {
                             pagax_modules.pagax.process_content(feed, response, feed.success);
                         } else {
-                            feed.success(feed.callback_parameters);
+                            feed.success(feed.callback_parameters.response, status, xhr);
                         }
 
                         obj.refresh_content(response);
