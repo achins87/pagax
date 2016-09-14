@@ -25,7 +25,7 @@
         </div>
 
     </body>
-    <script type="text/javascript" src="js/pagax.min.js"></script>
+    <script type="text/javascript" src="js/pagax.js"></script>
     <script type="text/javascript" src="js/script.js"></script>
 
     <div id="page_scripts">

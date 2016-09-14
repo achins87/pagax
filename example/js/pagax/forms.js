@@ -20,14 +20,18 @@ pagax_modules.forms = pagax_modules.forms || {
                     jQuery.error = "Undefined attr name for "+elem[j];
                 }
 
-                if (element_name.match(/\[\]/g)) {
-                    element_name = element_name.replace("[]", "");
-                    if(!$.isArray(arr[element_name])) {
-                        arr[element_name] = [];
+                if(element_name != undefined) {
+
+                    if (element_name.match(/\[\]/g)) {
+                        element_name = element_name.replace("[]", "");
+                        if(!$.isArray(arr[element_name])) {
+                            arr[element_name] = [];
+                        }
+                        arr[element_name].push($(this).val());
+                    } else {
+                        arr[element_name] = $(this).val();
                     }
-                    arr[element_name].push($(this).val());
-                } else {
-                    arr[element_name] = $(this).val();
+
                 }
             });
         }
@@ -60,19 +64,19 @@ $.fn.onSubmit = function(options){
     $(this).off("submit").on("submit", function(e){
         e.preventDefault();
 
-        if (options.hasOwnProperty("validate") && !options.validate(submit_parameters.id)) {
+        if (options.hasOwnProperty("validate") && !$(this).hasClass("isValid")) {
             return false;
         }
 
         if(!pagax_modules.ajax.form_is_in_progress) {
             pagax_modules.ajax.form_is_in_progress = true;
 
-            submit_parameters.data = {action:parameters.action, request:"ajax", requesting_url:window.location.href, view_only:true};
-            submit_parameters.data = $.extend({}, submit_parameters.data, pagax_modules.forms.get_values(parameters.id));
-            var get_parameters = obj.parseQueryString(location.search);
+            submit_parameters.data = $.extend({}, submit_parameters.data, pagax_modules.forms.get_values(submit_parameters.id));
+            var get_parameters = pagax_modules.ajax.parseQueryString(location.search);
             if (get_parameters != "undefined") {
                 submit_parameters.data = $.extend({}, submit_parameters.data, get_parameters);
             }
+
             pagax_modules.ajax.submit_form(submit_parameters);
         }
     });
