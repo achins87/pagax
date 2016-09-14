@@ -1,3 +1,4 @@
+var pagax_modules={};
 pagax_modules.ajax = pagax_modules.ajax || {
 
     default_request: {
