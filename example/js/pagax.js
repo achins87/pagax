@@ -28,7 +28,7 @@ pagax_modules.ajax = pagax_modules.ajax || {
             success_message:parameters.hasOwnProperty("success_message")?parameters.success_message:"",
             error_message:parameters.hasOwnProperty("error_message")?parameters.error_message:"",
             contentType:parameters.hasOwnProperty("contentType")?parameters.contentType:"application/x-www-form-urlencoded; charset=UTF-8",
-            processData:parameters.hasOwnProperty("processData")?parameters.processData:"",
+            processData:parameters.hasOwnProperty("processData")?parameters.processData:true,
             beforeSend:function(response,status,xhr){
                 if(parameters.hasOwnProperty("beforeSend") && typeof parameters.beforeSend == 'function') {
                     parameters.beforeSend(response,status,xhr);
@@ -74,6 +74,7 @@ pagax_modules.ajax = pagax_modules.ajax || {
             type:feed.type,
             timeout:60000,
             contentType : feed.contentType,
+            processData:feed.processData,
             beforeSend:function(xhr) {
                 obj.running_requests.push(feed.url);
                 obj.running_request_parameters[feed.url] = feed;
