@@ -779,4 +779,5 @@ $(document).on("page_ready", function(){
 
 $.fn.loaded = function (parameters) {
     $(this).pagax();
+    $(this).load_complete();
 };
