@@ -747,7 +747,7 @@ $.fn.pagax = function() {
         });
     });
 
-    $(document).off("onkeyup").on("onkeyup", function(e){
+    $(document).off("keyup").on("keyup", function(e){
         $.each(pagax_modules, function(key, func){
             if($.isFunction(func.onkeyup))
             {
