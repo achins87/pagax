@@ -102,14 +102,14 @@ pagax_modules.ajax = pagax_modules.ajax || {
                     feed.callback_parameters.is_json = false;
                 }
 
-                if (response.hasOwnProperty("data")) {
-                    feed.callback_parameters.response = response;
-                } else {
+                feed.callback_parameters.response = response;
+
+                if (!response.hasOwnProperty("data")) {
                     feed.callback_parameters["data"] = {
                         title : "",
                     };
                 }
-                
+
                 if(response != null) {
 
                     if (response.status == "success") {
