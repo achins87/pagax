@@ -305,9 +305,10 @@ pagax_modules.ajax = pagax_modules.ajax || {
     },
     parseQueryString : function(queryString) {
 
+        var params = {};
         if(queryString) {
 
-            var params = {}, queries, temp, i, l;
+            var queries, temp, i, l;
             queryString = queryString.split("?");
             queries = queryString[1].split("&");
 
@@ -315,8 +316,8 @@ pagax_modules.ajax = pagax_modules.ajax || {
                 temp = queries[i].split('=');
                 params[temp[0]] = temp[1];
             }
-            return params;
         }
+        return params;
     },
 
     set_callback_parameters : function (response, parameters, has_form_parameters) {
