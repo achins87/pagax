@@ -27,7 +27,7 @@ var modal = {
     }
 };
 
-pagax_modules.settings = {
+$.initPagax({
     modal : {
         container : ".modal_container",
         modal : ".modal",
@@ -38,7 +38,8 @@ pagax_modules.settings = {
         remove : modal.remove,
         onready : modal.onready
     }
-};
+});
+
 
 $(document).on("page_ready", function(){
 /*

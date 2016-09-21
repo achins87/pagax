@@ -756,26 +756,32 @@ $.fn.pagax = function() {
     });
 }
 
+$.initPagax = function(options){
 
-window.onpopstate = function(event) {
-    $.each(pagax_modules, function(key, func){
-        if($.isFunction(func.onpopstate))
-        {
-            func.onpopstate(event);
-        }
+    pagax_modules.settings = options;
+
+    window.onpopstate = function(event) {
+        $.each(pagax_modules, function(key, func){
+            if($.isFunction(func.onpopstate))
+            {
+                func.onpopstate(event);
+            }
+        });
+    };
+
+    $(document).ready(function(){
+
+        $(document).trigger("page_ready");
+
     });
-};
 
-$(document).ready(function(){
-
-    $(document).trigger("page_ready");
-
-});
-
+}
 
 $(document).on("page_ready", function(){
     $("body").loaded();
 });
+
+$.fn.load_complete = function (parameters) {}
 
 $.fn.loaded = function (parameters) {
     $(this).pagax();
