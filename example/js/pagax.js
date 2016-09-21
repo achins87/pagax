@@ -257,31 +257,32 @@ pagax_modules.ajax = pagax_modules.ajax || {
         var success_function = parameters.hasOwnProperty("success") ? parameters.success : "";
         var failed_function = parameters.hasOwnProperty("failed") ? parameters.failed : "";
 
-        parameters["success"] = function(response){
+        var handlers = {
+            success : function(response){
 
-            if(response != "") {
-                var has_form_parameters = true;
+                if(response != "") {
+                    var has_form_parameters = true;
 
-                if(response.hasOwnProperty("data") && response.data.hasOwnProperty("redirect")) {
-                    pagax_modules.pagax.handle_redirect(response);
-                    return false;
+                    if(response.hasOwnProperty("data") && response.data.hasOwnProperty("redirect")) {
+                        pagax_modules.pagax.handle_redirect(response);
+                        return false;
+                    }
+
+                    if(typeof success_function == "function") {
+                        success_function(response);
+                        // obj.call_callback(parameters.success, response, parameters, has_form_parameters);
+                    }
                 }
-
-                if(typeof success_function == "function") {
-                    success_function(response);
-                    // obj.call_callback(parameters.success, response, parameters, has_form_parameters);
+            },
+            failed : function(response){
+                if(typeof failed_function == "function") {
+                    failed_function(response);
                 }
+                return false;
             }
-
         };
 
-        parameters["failed"] = function(response){
-            if(typeof failed_function == "function") {
-                failed_function(response);
-            }
-            return false;
-        }
-
+        parameters = $.extend({}, parameters, handlers);
         obj.new_request(parameters);
         return false;
     },
