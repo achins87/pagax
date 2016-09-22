@@ -790,7 +790,6 @@ $.fn.load_complete = function (parameters) {}
 
 $.fn.loaded = function (parameters) {
     $(this).pagax();
-    $(this).load_complete();
 
     $("[data-ajax_form='true']").each(function(){
         var form = $(this);
@@ -800,4 +799,5 @@ $.fn.loaded = function (parameters) {
         });
     });
 
+    $(this).load_complete();
 };
