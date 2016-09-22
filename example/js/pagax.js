@@ -383,11 +383,15 @@ pagax_modules.forms = pagax_modules.forms || {
                 if(element_name != undefined) {
 
                     if (element_name.match(/\[\]/g)) {
-                        element_name = element_name.replace("[]", "");
-                        if(!$.isArray(arr[element_name])) {
-                            arr[element_name] = [];
+
+                        if($(this).is(":checked")) {
+                            element_name = element_name.replace("[]", "");
+                            if(!$.isArray(arr[element_name])) {
+                                arr[element_name] = [];
+                            }
+                            arr[element_name].push($(this).val());
                         }
-                        arr[element_name].push($(this).val());
+
                     } else {
                         arr[element_name] = $(this).val();
                     }
