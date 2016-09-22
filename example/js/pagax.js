@@ -430,9 +430,10 @@ $.fn.onSubmit = function(options){
 
     $(this).off("submit").on("submit", function(e){
         e.preventDefault();
+        var form = $(this);
 
         setTimeout(function(){
-            if (options.hasOwnProperty("validate") && !$(this).hasClass("isValid")) {
+            if (options.hasOwnProperty("validate") && !form.hasClass("isValid")) {
                 return false;
             }
 
