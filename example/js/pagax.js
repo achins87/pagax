@@ -76,6 +76,7 @@ pagax_modules.ajax = pagax_modules.ajax || {
             contentType : feed.contentType,
             processData:feed.processData,
             beforeSend:function(xhr) {
+                $(".cancel-loader").removeClass("open-loader");
                 obj.running_requests.push(feed.url);
                 obj.running_request_parameters[feed.url] = feed;
                 if (obj.active_request == "") {
@@ -162,6 +163,7 @@ pagax_modules.ajax = pagax_modules.ajax || {
                         $(".pagax-loader-layer .message").html("Some error occurred");
                     }
 
+                    $(".cancel-loader").addClass("open-loader");
                     feed.failed(response,status,xhr);
 
                 } else if (response == null) {
