@@ -431,21 +431,23 @@ $.fn.onSubmit = function(options){
     $(this).off("submit").on("submit", function(e){
         e.preventDefault();
 
-        if (options.hasOwnProperty("validate") && !$(this).hasClass("isValid")) {
-            return false;
-        }
-
-        if(!pagax_modules.ajax.form_is_in_progress) {
-            pagax_modules.ajax.form_is_in_progress = true;
-
-            submit_parameters.data = $.extend({}, submit_parameters.data, pagax_modules.forms.get_values(submit_parameters.id));
-            var get_parameters = pagax_modules.ajax.parseQueryString(location.search);
-            if (get_parameters != "undefined") {
-                submit_parameters.data = $.extend({}, submit_parameters.data, get_parameters);
+        setTimeout(function(){
+            if (options.hasOwnProperty("validate") && !$(this).hasClass("isValid")) {
+                return false;
             }
 
-            pagax_modules.ajax.submit_form(submit_parameters);
-        }
+            if(!pagax_modules.ajax.form_is_in_progress) {
+                pagax_modules.ajax.form_is_in_progress = true;
+
+                submit_parameters.data = $.extend({}, submit_parameters.data, pagax_modules.forms.get_values(submit_parameters.id));
+                var get_parameters = pagax_modules.ajax.parseQueryString(location.search);
+                if (get_parameters != "undefined") {
+                    submit_parameters.data = $.extend({}, submit_parameters.data, get_parameters);
+                }
+
+                pagax_modules.ajax.submit_form(submit_parameters);
+            }
+        }, 1);
     });
 };
 
