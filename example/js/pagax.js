@@ -499,7 +499,7 @@ pagax_modules.pagax = pagax_modules.pagax || {
                             pagax_modules.settings.modal.hide(parameters.post_parameters.data.target);
                         }
                     }
-                })
+                });
             }
         }
 
@@ -579,6 +579,7 @@ pagax_modules.pagax = pagax_modules.pagax || {
     onpopstate : function(event) {
 
         var obj = this;
+
         if (event.state.hasOwnProperty("next") && event.state.next.anchor.hasOwnProperty("data") && event.state.next.anchor.data.hasOwnProperty("targetType") && event.state.next.anchor.data.targetType == "modal" && $("#"+event.state.next.anchor.target).length) {
             pagax_modules.settings.modal.hide(event.state.next.anchor.data.target);
             setTimeout(function(){
@@ -725,6 +726,14 @@ pagax_modules.pagax = pagax_modules.pagax || {
         obj = this;
         e = (e) ? e : document.event;
         obj.key_pressed = (e.which) ? e.which : e.keyCode;
+
+        if(obj.key_pressed == 27) {
+            if (window.history.state.hasOwnProperty("anchor") && window.history.state.anchor.hasOwnProperty("data") && window.history.state.anchor.data.hasOwnProperty("targetType") && window.history.state.anchor.data.targetType == "modal" && $("#"+window.history.state.anchor.target).length) {
+                window.history.back();
+                return false;
+            }
+
+        }
     },
     onkeyup : function (e) {
         obj = this;
