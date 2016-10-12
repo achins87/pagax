@@ -422,6 +422,7 @@ pagax_modules.forms = pagax_modules.forms || {
 
 $.fn.onSubmit = function(options){
     options.url = options.hasOwnProperty("url") ? options.url : $(this).attr("action");
+    options.type = options.hasOwnProperty("type") ? options.type : $(this).attr("method");
     options.before_message = options.hasOwnProperty("before_message") ? options.before_message : "Loading..";
     var submit_parameters = pagax_modules.ajax.build(options);
     submit_parameters.id = $(this).attr("id");
