@@ -849,5 +849,5 @@ $.fn.loaded = function (response) {
         });
     });
 
-    $(this).load_complete();
+    $(this).load_complete(response);
 };
