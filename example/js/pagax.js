@@ -270,10 +270,16 @@ pagax_modules.ajax = pagax_modules.ajax || {
                         return false;
                     }
 
-                    if(typeof success_function == "function") {
-                        success_function(response);
-                        // obj.call_callback(parameters.success, response, parameters, has_form_parameters);
+                    if(response.hasOwnProperty("data") && response.data.hasOwnProperty("push_url")) {
+                        // console.log(response);
+                        pagax_modules.pagax.push_state(response);
                     }
+
+                    else if(typeof success_function == "function") {
+                        success_function(response);
+                        obj.call_callback(parameters.success, response, parameters, has_form_parameters);
+                    }
+
                 }
             },
             failed : function(response){
@@ -300,7 +306,7 @@ pagax_modules.ajax = pagax_modules.ajax || {
                     data : data,
                     success : function(resp) {
                         $("#"+item).html(resp.data.content);
-                        $("#"+item).loaded();
+                        $("#"+item).loaded(resp);
                     }
                 });
             });
@@ -447,6 +453,15 @@ $.fn.onSubmit = function(options){
                     submit_parameters.data = $.extend({}, submit_parameters.data, get_parameters);
                 }
 
+                submit_parameters.anchor = {
+                    data : {
+                        target : form.data("target") != undefined ? form.data("target") : "content_container"
+                    },
+                    target : form.data("target") != undefined ? form.data("target") : "content_container"
+                };
+
+                submit_parameters.data["data"] = submit_parameters.anchor.data;
+
                 pagax_modules.ajax.submit_form(submit_parameters);
             }
         }, 1);
@@ -550,6 +565,22 @@ pagax_modules.pagax = pagax_modules.pagax || {
         }
     },
 
+    push_state : function (response) {
+        obj = this;
+
+        if(response.data.hasOwnProperty("push_url")) {
+
+            var page = {};
+            previous = history.state;
+            page.id = previous.id+1;
+            page.url = response.data.push_url;
+            page.title = response.data.title;
+            page.anchor = {target:response.data.target};
+
+            obj.navigation_callback({page:page, previous:previous, data:response.data});
+        }
+    },
+
     set_page_content : function(parameters) {
 
         var obj = this;
@@ -572,8 +603,8 @@ pagax_modules.pagax = pagax_modules.pagax || {
         }
 
         setTimeout(function () {
-            $(document).trigger("page_ready");
-            $(document).trigger("page_load");
+            $(document).trigger("page_ready", parameters.response);
+            $(document).trigger("page_load", parameters.response);
         }, 50);
     },
 
@@ -801,13 +832,13 @@ $.initPagax = function(options){
 
 }
 
-$(document).on("page_ready", function(){
-    $("body").loaded();
+$(document).on("page_ready", function(event, response){
+    $("body").loaded(response);
 });
 
-$.fn.load_complete = function (parameters) {}
+$.fn.load_complete = function (response) {}
 
-$.fn.loaded = function (parameters) {
+$.fn.loaded = function (response) {
     $(this).pagax();
 
     $("[data-ajax_form='true']").each(function(){
