@@ -277,7 +277,6 @@ pagax_modules.ajax = pagax_modules.ajax || {
 
                     else if(typeof success_function == "function") {
                         success_function(response);
-                        obj.call_callback(parameters.success, response, parameters, has_form_parameters);
                     }
 
                 }
@@ -331,8 +330,11 @@ pagax_modules.ajax = pagax_modules.ajax || {
 
     set_callback_parameters : function (response, parameters, has_form_parameters) {
         callback_parameters = parameters.hasOwnProperty('callback_parameters')?parameters.callback_parameters:{};
-        callback_parameters.title = response.data.hasOwnProperty("title")?response.data.title:history.state.title;
-        callback_parameters.data = response.data;
+        callback_parameters.title = (response.hasOwnProperty("data") && response.data.hasOwnProperty("title")) ? response.data.title:history.state.title;
+
+        if(response.hasOwnProperty("data")) {
+            callback_parameters.data = response.data;
+        }
 
         if(has_form_parameters) {
             callback_parameters.form_parameters = true;
