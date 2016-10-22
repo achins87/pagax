@@ -621,6 +621,12 @@ pagax_modules.pagax = pagax_modules.pagax || {
             });
         }
 
+        if (parameters.response.hasOwnProperty("hide")) {
+            $.each(parameters.response.hide, function(section){
+                $("#"+section).hide();
+            });
+        }
+
         setTimeout(function () {
             $(document).trigger("page_ready", parameters.response);
             $(document).trigger("page_load", parameters.response);
