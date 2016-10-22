@@ -300,7 +300,7 @@ pagax_modules.ajax = pagax_modules.ajax || {
         if (response.hasOwnProperty("data") && response.data.hasOwnProperty("show")) {
             $.each(response.data.show, function(refresh_route, section){
                 if($("#" + section).html().trim() != "") {
-                    $("#" + section).html().find(">").show();
+                    $("#" + section).find(">").show();
                 } else {
                     obj.refresh_section(refresh_route, section);
                 }
