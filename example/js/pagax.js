@@ -295,21 +295,38 @@ pagax_modules.ajax = pagax_modules.ajax || {
     },
 
     refresh_content : function (response) {
-        if (response.hasOwnProperty("data") && response.data.hasOwnProperty("refresh")) {
-            $.each(response.data.refresh, function(refresh_key, item){
-                var data = {};
+        obj = this;
 
-                $.ajax_request({
-                    url : HOST+refresh_key,
-                    before_message : "Loading",
-                    data : data,
-                    success : function(resp) {
-                        $("#"+item).html(resp.data.content);
-                        $("#"+item).loaded(resp);
-                    }
-                });
+        if (response.hasOwnProperty("data") && response.data.hasOwnProperty("show")) {
+            $.each(response.data.show, function(refresh_route, section){
+                if($("#" + section).html().trim() != "") {
+                    $("#" + section).html().find(">").show();
+                } else {
+                    obj.refresh_section(refresh_route, section);
+                }
             });
         }
+
+        if (response.hasOwnProperty("data") && response.data.hasOwnProperty("refresh")) {
+            $.each(response.data.refresh, function(refresh_route, section){
+                obj.refresh_section(refresh_route, section);
+            });
+        }
+    },
+
+    refresh_section : function(refresh_route, section) {
+        obj = this;
+        var data = {};
+
+        $.ajax_request({
+            url : HOST+refresh_route,
+            before_message : "Loading",
+            data : data,
+            success : function(resp) {
+                $("#"+section).html(resp.data.content);
+                $("#"+section).loaded(resp);
+            }
+        });
     },
     parseQueryString : function(queryString) {
 
