@@ -857,6 +857,10 @@ $.initPagax = function(options){
 
 }
 
+$(document).on("ready", function(){
+    $(document).trigger("page_ready");
+});
+
 $(document).on("page_ready", function(event, response){
     $("body").loaded(response);
 });
