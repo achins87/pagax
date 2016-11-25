@@ -29,6 +29,7 @@ pagax_modules.ajax = pagax_modules.ajax || {
             error_message:parameters.hasOwnProperty("error_message")?parameters.error_message:"",
             contentType:parameters.hasOwnProperty("contentType")?parameters.contentType:"application/x-www-form-urlencoded; charset=UTF-8",
             processData:parameters.hasOwnProperty("processData")?parameters.processData:true,
+            async:parameters.hasOwnProperty("async")?parameters.async:true,
             beforeSend:function(response,status,xhr){
                 if(parameters.hasOwnProperty("beforeSend") && typeof parameters.beforeSend == 'function') {
                     parameters.beforeSend(response,status,xhr);
