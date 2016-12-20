@@ -460,8 +460,14 @@ $.fn.onSubmit = function(options){
         var form = $(this);
 
         setTimeout(function(){
-            if (options.hasOwnProperty("validate") && !form.hasClass("isValid")) {
-                return false;
+            if (options.hasOwnProperty("validate") && options.validate) {
+                if(options.hasOwnProperty("validation")) {
+                    if(!options.validation()) {
+                        return false;
+                    }
+                } else if(!form.hasClass("isValid")) {
+                    return false;
+                }
             }
 
             if(!pagax_modules.ajax.form_is_in_progress) {
@@ -529,7 +535,27 @@ pagax_modules.pagax = pagax_modules.pagax || {
 
                 $("#"+parameters.post_parameters.data.target).parents(pagax_modules.settings.modal.container).off("click").on("click", function(e){
                     if (!$("#"+parameters.post_parameters.data.target).is(e.target) && $("#"+parameters.post_parameters.data.target).has(e.target).length === 0) {
-                        if (!(window.history.state.hasOwnProperty("next") && window.history.state.next.anchor.hasOwnProperty("data") && window.history.state.next.anchor.data.hasOwnProperty("target") && window.history.state.next.anchor.target == parameters.post_parameters.data.target)) {
+
+                        if (
+                            !(
+                                window.history.state.hasOwnProperty("next") &&
+                                window.history.state.next.hasOwnProperty("anchor") &&
+                                window.history.state.next.anchor.hasOwnProperty("data") &&
+                                window.history.state.next.anchor.data.hasOwnProperty("target") &&
+                                window.history.state.next.anchor.target == parameters.post_parameters.data.target
+                            ) ||
+                            (
+                                window.history.state.hasOwnProperty("anchor") &&
+                                window.history.state.anchor.hasOwnProperty("data") &&
+                                window.history.state.anchor.data.hasOwnProperty("target") &&
+
+                                window.history.state.hasOwnProperty("next") &&
+                                window.history.state.next.hasOwnProperty("anchor") &&
+                                window.history.state.next.anchor.hasOwnProperty("data") &&
+                                window.history.state.next.anchor.data.hasOwnProperty("target") &&
+                                window.history.state.anchor.target == window.history.state.next.anchor.target
+                            )
+                        ) {
                             window.history.back();
                         } else {
                             pagax_modules.settings.modal.hide(parameters.post_parameters.data.target);
@@ -638,7 +664,26 @@ pagax_modules.pagax = pagax_modules.pagax || {
 
         var obj = this;
 
-        if (event.state.hasOwnProperty("next") && event.state.next.anchor.hasOwnProperty("data") && event.state.next.anchor.data.hasOwnProperty("targetType") && event.state.next.anchor.data.targetType == "modal" && $("#"+event.state.next.anchor.target).length) {
+        if (
+            event.state.hasOwnProperty("next") &&
+            event.state.next.anchor.hasOwnProperty("data") &&
+            event.state.next.anchor.data.hasOwnProperty("targetType") &&
+            event.state.next.anchor.data.targetType == "modal" &&
+            (
+                !event.state.anchor.hasOwnProperty("data") ||
+                (
+                    event.state.anchor.hasOwnProperty("data") &&
+                    (
+                        !event.state.anchor.data.hasOwnProperty("targetType") ||
+                        (
+                            event.state.anchor.data.hasOwnProperty("targetType") &&
+                            event.state.anchor.data.targetType != "modal"
+                        )
+                    )
+                )
+            ) &&
+            $("#"+event.state.next.anchor.target).length
+        ) {
             pagax_modules.settings.modal.hide(event.state.next.anchor.data.target);
             setTimeout(function(){
                 pagax_modules.settings.modal.remove(event.state.next.anchor.data.target);
