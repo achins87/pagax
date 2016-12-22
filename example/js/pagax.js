@@ -414,9 +414,7 @@ pagax_modules.forms = pagax_modules.forms || {
                             if(!$.isArray(arr[element_name])) {
                                 arr[element_name] = [];
                             }
-                            if(arr[element_name].indexOf($(this).val()) < 0) {
-                                arr[element_name].push($(this).val());
-                            }
+                            arr[element_name].push($(this).val());
                         }
 
                     } else {
