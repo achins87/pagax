@@ -272,7 +272,6 @@ pagax_modules.ajax = pagax_modules.ajax || {
                     }
 
                     if(response.hasOwnProperty("data") && response.data.hasOwnProperty("push_url")) {
-                        // console.log(response);
                         pagax_modules.pagax.push_state(response);
                     }
 
@@ -410,7 +409,7 @@ pagax_modules.forms = pagax_modules.forms || {
 
                     if (element_name.match(/\[\]/g)) {
 
-                        if($(this).is(":checked")) {
+                        if(($(this).attr("type") == "checkbox" && $(this).is(":checked")) || ($(this).attr("type") != "checkbox")) {
                             element_name = element_name.replace("[]", "");
                             if(!$.isArray(arr[element_name])) {
                                 arr[element_name] = [];
