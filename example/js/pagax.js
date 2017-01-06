@@ -22,6 +22,7 @@ pagax_modules.ajax = pagax_modules.ajax || {
     build : function(parameters){
         var request = {
             url:parameters.url,
+            timeout:parameters.hasOwnProperty("timeout")?parameters.timeout:60000,
             type:parameters.hasOwnProperty("type")?parameters.type:"POST",
             data:parameters.hasOwnProperty("data") ? parameters.data : {},
             before_message:parameters.hasOwnProperty("before_message")?parameters.before_message:"",
@@ -67,13 +68,12 @@ pagax_modules.ajax = pagax_modules.ajax || {
     },
     new_request : function(feed) {
         var obj = this;
-
         feed = obj.build(feed);
         var request = $.ajax({
             url:feed.url,
             data:feed.data,
             type:feed.type,
-            timeout:60000,
+            timeout:feed.timeout,
             contentType : feed.contentType,
             processData:feed.processData,
             beforeSend:function(xhr) {
@@ -444,6 +444,15 @@ pagax_modules.forms = pagax_modules.forms || {
 };
 
 $.fn.onSubmit = function(options){
+
+    if(!options.hasOwnProperty("timeout")) {
+        if($(this).data("type") == "script" && pagax_modules.settings.hasOwnProperty("script") && pagax_modules.settings.script.hasOwnProperty("timeout")) {
+            options.timeout = pagax_modules.settings.script.timeout;
+        } else if (pagax_modules.settings.hasOwnProperty("ajax") && pagax_modules.settings.script.hasOwnProperty("timeout")) {
+            options.timeout = pagax_modules.settings.script.timeout;
+        }
+    }
+
     options.url = options.hasOwnProperty("url") ? options.url : $(this).attr("action");
     options.type = options.hasOwnProperty("type") ? options.type : $(this).attr("method");
     options.before_message = options.hasOwnProperty("before_message") ? options.before_message : "Loading..";
@@ -519,6 +528,10 @@ pagax_modules.pagax = pagax_modules.pagax || {
                 obj.process_content(parameters, response, callback_function);
             }
         };
+
+        if(parameters.hasOwnProperty("timeout")) {
+            ajax_parameters.timeout = parameters.timeout;
+        }
 
         if(parameters.hasOwnProperty("post_parameters")) {
             ajax_parameters.data = $.extend({}, ajax_parameters.data, parameters.post_parameters);
@@ -809,6 +822,13 @@ pagax_modules.pagax = pagax_modules.pagax || {
                                 }
                             });
                             parameters.url = location;
+
+                            if(anchor.data("type") == "script" && pagax_modules.settings.hasOwnProperty("script") && pagax_modules.settings.script.hasOwnProperty("timeout")) {
+                                parameters.timeout = pagax_modules.settings.script.timeout;
+                            } else if (pagax_modules.settings.hasOwnProperty("ajax") && pagax_modules.settings.script.hasOwnProperty("timeout")) {
+                                parameters.timeout = pagax_modules.settings.script.timeout;
+                            }
+
                             obj.load_content(parameters, pagax_modules.pagax["navigation_callback"]);
                         }
 
