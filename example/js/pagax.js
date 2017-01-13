@@ -542,36 +542,6 @@ pagax_modules.pagax = pagax_modules.pagax || {
                     pagax_modules.settings.modal.create(parameters.post_parameters.data.target);
                 }
                 pagax_modules.settings.modal.activate(parameters.post_parameters.data.target);
-
-                $("#"+parameters.post_parameters.data.target).parents(pagax_modules.settings.modal.container).off("click").on("click", function(e){
-                    if (!$("#"+parameters.post_parameters.data.target).is(e.target) && $("#"+parameters.post_parameters.data.target).has(e.target).length === 0) {
-
-                        if (
-                            !(
-                                window.history.state.hasOwnProperty("next") &&
-                                window.history.state.next.hasOwnProperty("anchor") &&
-                                window.history.state.next.anchor.hasOwnProperty("data") &&
-                                window.history.state.next.anchor.data.hasOwnProperty("target") &&
-                                window.history.state.next.anchor.target == parameters.post_parameters.data.target
-                            ) ||
-                            (
-                                window.history.state.hasOwnProperty("anchor") &&
-                                window.history.state.anchor.hasOwnProperty("data") &&
-                                window.history.state.anchor.data.hasOwnProperty("target") &&
-
-                                window.history.state.hasOwnProperty("next") &&
-                                window.history.state.next.hasOwnProperty("anchor") &&
-                                window.history.state.next.anchor.hasOwnProperty("data") &&
-                                window.history.state.next.anchor.data.hasOwnProperty("target") &&
-                                window.history.state.anchor.target == window.history.state.next.anchor.target
-                            )
-                        ) {
-                            window.history.back();
-                        } else {
-                            pagax_modules.settings.modal.hide(parameters.post_parameters.data.target);
-                        }
-                    }
-                });
             }
         }
 
@@ -670,6 +640,30 @@ pagax_modules.pagax = pagax_modules.pagax || {
         }, 50);
     },
 
+    on_modal_hide : function(target) {
+        if (
+            !(
+                window.history.state.hasOwnProperty("next") &&
+                window.history.state.next.hasOwnProperty("anchor") &&
+                window.history.state.next.anchor.hasOwnProperty("data") &&
+                window.history.state.next.anchor.data.hasOwnProperty("target") &&
+                window.history.state.next.anchor.target == target
+            ) ||
+            (
+                window.history.state.hasOwnProperty("anchor") &&
+                window.history.state.anchor.hasOwnProperty("data") &&
+                window.history.state.anchor.data.hasOwnProperty("target") &&
+
+                window.history.state.hasOwnProperty("next") &&
+                window.history.state.next.hasOwnProperty("anchor") &&
+                window.history.state.next.anchor.hasOwnProperty("data") &&
+                window.history.state.next.anchor.data.hasOwnProperty("target") &&
+                window.history.state.anchor.target == target
+            )
+        ) {
+            window.history.back();
+        }
+    },
     onpopstate : function(event) {
 
         var obj = this;
