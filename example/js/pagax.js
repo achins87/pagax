@@ -20,6 +20,7 @@ pagax_modules.ajax = pagax_modules.ajax || {
     running_requests : [],
     running_request_parameters : {},
     build : function(parameters){
+
         var request = {
             url:parameters.url,
             timeout:parameters.hasOwnProperty("timeout")?parameters.timeout:60000,
@@ -302,21 +303,36 @@ pagax_modules.ajax = pagax_modules.ajax || {
                 if($("#" + section).html().trim() != "") {
                     $("#" + section).find(">").show();
                 } else {
-                    obj.refresh_section(refresh_route, section);
+                    obj.refresh_section(response, refresh_route, section);
                 }
             });
         }
 
         if (response.hasOwnProperty("data") && response.data.hasOwnProperty("refresh")) {
             $.each(response.data.refresh, function(refresh_route, section){
-                obj.refresh_section(refresh_route, section);
+                obj.refresh_section(response, refresh_route, section);
             });
         }
     },
 
-    refresh_section : function(refresh_route, section) {
+    refresh_section : function(response, refresh_route, section) {
         obj = this;
         var data = {};
+
+        if(response.data.hasOwnProperty("redirect")) {
+            var url = response.data.redirect.split('?');
+            if(url.hasOwnProperty(1)) {
+                var queryString = url[1];
+                var get_parameters = pagax_modules.ajax.parseQueryString("?"+queryString);
+            }
+        } else {
+            var get_parameters = pagax_modules.ajax.parseQueryString(location.search);
+        }
+
+
+        if (get_parameters != "undefined") {
+            data = $.extend(get_parameters, data);
+        }
 
         $.ajax_request({
             url : HOST+refresh_route,
@@ -480,9 +496,12 @@ $.fn.onSubmit = function(options){
                 pagax_modules.ajax.form_is_in_progress = true;
 
                 submit_parameters.data = $.extend({}, submit_parameters.data, pagax_modules.forms.get_values(submit_parameters.id));
+
+                submit_parameters.data = submit_parameters.hasOwnProperty("data") ? submit_parameters.data : {};
                 var get_parameters = pagax_modules.ajax.parseQueryString(location.search);
+
                 if (get_parameters != "undefined") {
-                    submit_parameters.data = $.extend({}, submit_parameters.data, get_parameters);
+                    submit_parameters.data = $.extend(get_parameters, submit_parameters.data);
                 }
 
                 submit_parameters.anchor = {
@@ -572,6 +591,29 @@ pagax_modules.pagax = pagax_modules.pagax || {
 
         pagax_modules.ajax.call_callback(callback_function, response, parameters);
 
+    },
+
+    refresh_page : function(event_state) {
+
+        var obj = this;
+
+        state_parameters = {
+            url:event_state.url,
+            link:event_state.url,
+            anchor:event_state.anchor,
+            before_message : "Refreshing.."
+        };
+
+        if (event_state.anchor.hasOwnProperty("data")) {
+            state_parameters.post_parameters = {
+                data : event_state.anchor.data
+            };
+        }
+
+        obj.load_content(state_parameters, function(parameters){
+            window.history.replaceState(event_state,parameters.title, event_state.url);
+            document.title = parameters.title;
+        });
     },
 
     handle_redirect : function (response) {
@@ -691,28 +733,12 @@ pagax_modules.pagax = pagax_modules.pagax || {
             pagax_modules.settings.modal.hide(event.state.next.anchor.data.target);
             setTimeout(function(){
                 pagax_modules.settings.modal.remove(event.state.next.anchor.data.target);
-            }, 100);
+            }, 200);
             return false;
         }
 
         if(event.state) {
-
-            state_parameters = {
-                url:event.state.url,
-                link:event.state.url,
-                anchor:event.state.anchor
-            };
-
-            if (event.state.anchor.hasOwnProperty("data")) {
-                state_parameters.post_parameters = {
-                    data : event.state.anchor.data
-                };
-            }
-
-            obj.load_content(state_parameters, function(parameters){
-                window.history.replaceState(event.state,parameters.title, event.state.url);
-                document.title = parameters.title;
-            });
+            obj.refresh_page(event.state);
         }
     },
 
@@ -856,7 +882,7 @@ pagax_modules.pagax = pagax_modules.pagax || {
 };
 
 $.fn.pagax = function() {
-    $(this).find("a[href]").each(function(){
+    $(this).find("a[href]:not([data-pagax_link='false'])").each(function(){
         var host = HOST;
         if(host.substr(-1) === '/') {
             host = host.substr(0, host.length - 1);
