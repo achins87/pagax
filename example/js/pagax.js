@@ -32,6 +32,7 @@ pagax_modules.ajax = pagax_modules.ajax || {
             contentType:parameters.hasOwnProperty("contentType")?parameters.contentType:"application/x-www-form-urlencoded; charset=UTF-8",
             processData:parameters.hasOwnProperty("processData")?parameters.processData:true,
             async:parameters.hasOwnProperty("async")?parameters.async:true,
+            crossDomain: parameters.hasOwnProperty("crossDomain")?parameters.crossDomain:false,
             beforeSend:function(response,status,xhr){
                 if(parameters.hasOwnProperty("beforeSend") && typeof parameters.beforeSend == 'function') {
                     parameters.beforeSend(response,status,xhr);
@@ -77,6 +78,8 @@ pagax_modules.ajax = pagax_modules.ajax || {
             timeout:feed.timeout,
             contentType : feed.contentType,
             processData:feed.processData,
+            async:feed.async,
+            crossDomain:feed.crossDomain,
             beforeSend:function(xhr) {
                 $(".cancel-loader").removeClass("open-loader");
                 obj.running_requests.push(feed.url);
@@ -580,6 +583,7 @@ pagax_modules.pagax = pagax_modules.pagax || {
 
             if(response.hasOwnProperty("data") && response.data.hasOwnProperty("redirect")) {
                 obj.handle_redirect(response);
+                $("body").loaded(response);
                 return false;
             }
 
@@ -677,8 +681,8 @@ pagax_modules.pagax = pagax_modules.pagax || {
         }
 
         setTimeout(function () {
-            $(document).trigger("page_ready", parameters.response);
-            $(document).trigger("page_load", parameters.response);
+            $(document).trigger("page_ready", [parameters.response]);
+            $(document).trigger("page_load", [parameters.response]);
         }, 50);
     },
 
@@ -932,17 +936,12 @@ $.initPagax = function(options){
         });
     };
 
-    $(document).ready(function(){
-
-        $(document).trigger("page_ready");
+    $(document).off("ready").on("ready", function(event){
+        $(document).trigger("page_ready", [{}]);
 
     });
 
 }
-
-$(document).on("ready", function(){
-    $(document).trigger("page_ready");
-});
 
 $(document).on("page_ready", function(event, response){
     $("body").loaded(response);
