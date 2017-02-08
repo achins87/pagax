@@ -261,10 +261,19 @@ pagax_modules.ajax = pagax_modules.ajax || {
             return true;
         }
 
+        var beforeSend_function = parameters.hasOwnProperty("beforeSend") ? parameters.beforeSend : "";
+        var complete_function = parameters.hasOwnProperty("complete") ? parameters.complete : "";
         var success_function = parameters.hasOwnProperty("success") ? parameters.success : "";
         var failed_function = parameters.hasOwnProperty("failed") ? parameters.failed : "";
 
         var handlers = {
+            beforeSend : function(response) {
+                pagax_modules.forms.disable($("#"+parameters.id));
+
+                if(typeof beforeSend_function == "function") {
+                    beforeSend_function(response);
+                }
+            },
             success : function(response){
 
                 if(response != "") {
@@ -290,6 +299,13 @@ pagax_modules.ajax = pagax_modules.ajax || {
                     failed_function(response);
                 }
                 return false;
+            },
+            complete : function(response) {
+                pagax_modules.forms.enable($("#"+parameters.id));
+
+                if(typeof complete_function == "function") {
+                    complete_function(response);
+                }
             }
         };
 
@@ -459,6 +475,17 @@ pagax_modules.forms = pagax_modules.forms || {
                 inputs[i].value = "";
             }
         }
+    },
+
+    disable : function (form) {
+        var inputs = form.find("input:text:not([disabled]), input[type='number']:not([disabled]), input:hidden:not([disabled]), input:password:not([disabled]), input:checkbox:not([disabled]), input:radio:not([disabled]), select:not([disabled]), textarea:not([disabled]), .ui.selection.dropdown:not([disabled]), input[type='submit']");
+        inputs.addClass("disabled").attr("disabled", "disabled");
+    },
+
+    enable : function (form) {
+        var inputs = form.find("input:text, input[type='number'], input:hidden, input:password, input:checkbox, input:radio, select, textarea, .ui.selection.dropdown, input[type='submit']");
+        inputs.removeClass("disabled").removeAttr("disabled");
+        inputs.not("[type='hidden']").first().focus();
     }
 };
 
