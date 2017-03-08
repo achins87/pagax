@@ -647,6 +647,16 @@ pagax_modules.pagax = pagax_modules.pagax || {
         });
     },
 
+    redirect_page : function(url) {
+        setTimeout(function(){
+            var urlString = "<div id='temp_pagax_link_container'><a id='temp_pagax_link' data-pagax_link='true' href='"+url+"'>link</a></div>";
+            $("body").append(urlString);
+            $("#temp_pagax_link_container").loaded();
+            $("#temp_pagax_link").trigger("click");
+            $("#temp_pagax_link_container").remove();
+        }, 500);
+    },
+
     handle_redirect : function (response) {
         obj = this;
 
@@ -783,7 +793,14 @@ pagax_modules.pagax = pagax_modules.pagax || {
 
         window.history.replaceState(parameters.previous,parameters.previous.title,parameters.previous.url);
 
-        if(!(parameters.page.anchor.hasOwnProperty("data") && parameters.page.anchor.data.hasOwnProperty("sameState") && parameters.page.anchor.data.sameState==true)) {
+        if(parameters.page.anchor.hasOwnProperty("data")) {
+
+            if(parameters.page.anchor.data.hasOwnProperty("replaceState") && parameters.page.anchor.data.replaceState) {
+                window.history.replaceState(parameters.page,parameters.page.title,parameters.page.url);
+            } else if(!(parameters.page.anchor.data.hasOwnProperty("sameState") && parameters.page.anchor.data.sameState)) {
+                window.history.pushState(parameters.page,parameters.page.title,parameters.page.url);
+            }
+        } else {
             window.history.pushState(parameters.page,parameters.page.title,parameters.page.url);
         }
 
@@ -842,7 +859,7 @@ pagax_modules.pagax = pagax_modules.pagax || {
             var anchor = $(this);
             var location = anchor.attr('href');
 
-            if(!((obj.user_agent.match(/Macintosh/g) && (obj.key_pressed == 91 || obj.key_pressed == 93)) || (obj.user_agent.match(/Macintosh/g) == null && obj.key_pressed == 17))){
+            /*if(!((obj.user_agent.match(/Macintosh/g) && (obj.key_pressed == 91 || obj.key_pressed == 93)) || (obj.user_agent.match(/Macintosh/g) == null && obj.key_pressed == 17))){*/
 
                 if(anchor.data("pagax_link") || anchor.is("div")) {
 
@@ -889,7 +906,7 @@ pagax_modules.pagax = pagax_modules.pagax || {
                         return false;
                     }
                 }
-            }
+            /*}*/
         });
 
     },
