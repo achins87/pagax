@@ -667,9 +667,27 @@ pagax_modules.pagax = pagax_modules.pagax || {
             page.id = previous.id+1;
             page.url = response.data.redirect;
             page.title = response.data.title;
-            page.anchor = {target:"content_container"};
+            page.anchor = {
+                target: response.data.hasOwnProperty("target") ? response.data.target : "content_container"
+            };
 
-            obj.load_content({before_message : "Redirecting..", redirect : true, url:response.data.redirect, link:response.data.redirect, callback_parameters:{page:page, previous:previous, data:response.data, title:response.data.title}, anchor:page.anchor, post_parameters:{force_ajax:true}}, pagax_modules.pagax["navigation_callback"]);
+            if(response.data.hasOwnProperty("targetType")) {
+                page.anchor.targetType = response.data.targetType;
+            }
+
+            if(response.data.hasOwnProperty("replaceState")) {
+                page.anchor.replaceState = response.data.replaceState;
+            }
+
+            if(response.data.hasOwnProperty("sameState")) {
+                page.anchor.sameState = response.data.sameState;
+            }
+
+            var post_parameters = {
+                data : page.anchor
+            };
+
+            obj.load_content({before_message : "Redirecting..", redirect : true, url:response.data.redirect, link:response.data.redirect, callback_parameters:{page:page, previous:previous, data:response.data, title:response.data.title}, anchor:page.anchor, post_parameters:post_parameters}, pagax_modules.pagax["navigation_callback"]);
             return false;
         }
     },
