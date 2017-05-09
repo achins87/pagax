@@ -33,10 +33,11 @@ pagax_modules.ajax = pagax_modules.ajax || {
             processData:parameters.hasOwnProperty("processData")?parameters.processData:true,
             async:parameters.hasOwnProperty("async")?parameters.async:true,
             crossDomain: parameters.hasOwnProperty("crossDomain")?parameters.crossDomain:false,
-            beforeSend:function(response,status,xhr){
+            beforeSend:function(xhr){
                 if(parameters.hasOwnProperty("beforeSend") && typeof parameters.beforeSend == 'function') {
-                    parameters.beforeSend(response,status,xhr);
+                    return parameters.beforeSend(xhr);
                 }
+                return true;
             },
             error:function(xhr,status,error){
                 if(parameters.hasOwnProperty("error") && typeof parameters.error == 'function') {
@@ -81,23 +82,26 @@ pagax_modules.ajax = pagax_modules.ajax || {
             async:feed.async,
             crossDomain:feed.crossDomain,
             beforeSend:function(xhr) {
-                $(".cancel-loader").removeClass("open-loader");
-                obj.running_requests.push(feed.url);
-                obj.running_request_parameters[feed.url] = feed;
-                if (obj.active_request == "") {
-                    obj.active_request = feed.url;
+                var beforeSendStatus = feed.beforeSend(xhr);
+
+                if(beforeSendStatus) {
+                    $(".cancel-loader").removeClass("open-loader");
+                    obj.running_requests.push(feed.url);
+                    obj.running_request_parameters[feed.url] = feed;
+                    if (obj.active_request == "") {
+                        obj.active_request = feed.url;
+                    }
+
+                    if(feed.before_message) {
+                        $(".pagax-loader-layer .message-box")
+                            .removeClass("success error");
+                        $(".pagax-loader-layer .message").html(obj.running_request_parameters.hasOwnProperty(obj.active_request) ? obj.running_request_parameters[obj.active_request].before_message : feed.before_message);
+                        $(".pagax-loader-layer").show();
+                    }
+
+                    obj.last_request = feed;
                 }
 
-                if(feed.before_message) {
-                    $(".pagax-loader-layer .message-box")
-                        .removeClass("success error");
-                    $(".pagax-loader-layer .message").html(obj.running_request_parameters.hasOwnProperty(obj.active_request) ? obj.running_request_parameters[obj.active_request].before_message : feed.before_message);
-                    $(".pagax-loader-layer").show();
-                }
-
-                obj.last_request = feed;
-
-                feed.beforeSend(xhr);
             },
 
             success:function(response,status,xhr) {
@@ -220,6 +224,8 @@ pagax_modules.ajax = pagax_modules.ajax || {
                 if(status == "error") {
                     if (error == "Internal Server Error") {
                         $(".pagax-loader-layer .message").html("Internal Server Error!&nbsp;<a class=\"link\" href=\"javascript:void(0);\" id=\"pagax_request_try_again\" style=\"float:none; margin-top:0;\">Try Again</a>");
+                    } else if (error == "Not Found") {
+                        $(".pagax-loader-layer .message").html("Page Not Found");
                     } else {
                         $(".pagax-loader-layer .message").html("Error!&nbsp;No internet connection.&nbsp;<a class=\"link\" href=\"javascript:void(0);\" id=\"pagax_request_try_again\" style=\"float:none; margin-top:0;\">Try Again</a>");
                     }
@@ -271,8 +277,10 @@ pagax_modules.ajax = pagax_modules.ajax || {
                 pagax_modules.forms.disable($("#"+parameters.id));
 
                 if(typeof beforeSend_function == "function") {
-                    beforeSend_function(response);
+                    return beforeSend_function(response);
                 }
+
+                return true;
             },
             success : function(response){
 
@@ -431,8 +439,8 @@ pagax_modules.forms = pagax_modules.forms || {
             var inputs = container.find(elem[j]);
 
             $(inputs).each(function(){
-
-                var element_name = $(this).attr("name")?$(this).attr("name"):$(this).attr("id");
+                var input = $(this);
+                var element_name = input.attr("name") ? input.attr("name") : input.attr("id");
 
                 if (element_name) {
                     element_name = element_name;
@@ -444,16 +452,18 @@ pagax_modules.forms = pagax_modules.forms || {
 
                     if (element_name.match(/\[\]/g)) {
 
-                        if(($(this).attr("type") == "checkbox" && $(this).is(":checked")) || ($(this).attr("type") != "checkbox")) {
+                        if((input.is(":checkbox") && input.is(":checked")) || (input.attr("type") != "checkbox")) {
                             element_name = element_name.replace("[]", "");
                             if(!$.isArray(arr[element_name])) {
                                 arr[element_name] = [];
                             }
-                            arr[element_name].push($(this).val());
+                            arr[element_name].push(input.val());
                         }
 
                     } else {
-                        arr[element_name] = $(this).val();
+                        if((input.is(":checkbox") && input.is(":checked")) || (input.attr("type") != "checkbox")) {
+                            arr[element_name] = input.val();
+                        }
                     }
 
                 }
@@ -485,7 +495,6 @@ pagax_modules.forms = pagax_modules.forms || {
     enable : function (form) {
         var inputs = form.find("input:text, input[type='number'], input:hidden, input:password, input:checkbox, input:radio, select, textarea, .ui.selection.dropdown, input[type='submit']");
         inputs.removeClass("disabled").removeAttr("disabled");
-        inputs.not("[type='hidden']").first().focus();
     }
 };
 
@@ -507,9 +516,12 @@ $.fn.onSubmit = function(options){
 
     pagax_modules.ajax.form_is_in_progress = false;
 
+    submit_parameters.defaultData = submit_parameters.data;
+
     $(this).off("submit").on("submit", function(e){
         e.preventDefault();
         var form = $(this);
+        submit_parameters.data = submit_parameters.defaultData;
 
         setTimeout(function(){
             if (options.hasOwnProperty("validate") && options.validate) {
@@ -569,8 +581,10 @@ pagax_modules.pagax = pagax_modules.pagax || {
             before_message:parameters.hasOwnProperty("before_message") ? parameters.before_message : "Loading..",
             beforeSend:function(xhr){
                 if (parameters.hasOwnProperty("beforeSend") && typeof parameters.beforeSend == 'function') {
-                    parameters.beforeSend(xhr);
+                    return parameters.beforeSend(xhr);
                 }
+
+                return true;
             },
             error:"",
             success:function(response,status,xhr){
@@ -913,6 +927,14 @@ pagax_modules.pagax = pagax_modules.pagax || {
                                 parameters.timeout = pagax_modules.settings.script.timeout;
                             } else if (pagax_modules.settings.hasOwnProperty("ajax") && pagax_modules.settings.script.hasOwnProperty("timeout")) {
                                 parameters.timeout = pagax_modules.settings.script.timeout;
+                            }
+
+                            if(pagax_modules.settings.navigation.hasOwnProperty("beforeSend")) {
+                                parameters.beforeSend = pagax_modules.settings.navigation.beforeSend;
+                            }
+
+                            if(pagax_modules.settings.navigation.hasOwnProperty("complete")) {
+                                parameters.complete = pagax_modules.settings.navigation.complete;
                             }
 
                             obj.load_content(parameters, pagax_modules.pagax["navigation_callback"]);
