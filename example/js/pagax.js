@@ -21,9 +21,17 @@ pagax_modules.ajax = pagax_modules.ajax || {
     running_request_parameters : {},
     build : function(parameters){
 
+        var timeout = 60000;
+
+        if(parameters.hasOwnProperty("timeout")) {
+            var timeout = parameters.hasOwnProperty("timeout");
+        } else if(pagax_modules.settings.hasOwnProperty("ajax") && pagax_modules.settings.ajax.hasOwnProperty("timeout")) {
+            timeout = pagax_modules.settings.ajax.timeout;
+        }
+
         var request = {
             url:parameters.url,
-            timeout:parameters.hasOwnProperty("timeout")?parameters.timeout:60000,
+            timeout:timeout,
             type:parameters.hasOwnProperty("type")?parameters.type:"POST",
             data:parameters.hasOwnProperty("data") ? parameters.data : {},
             before_message:parameters.hasOwnProperty("before_message")?parameters.before_message:"",
