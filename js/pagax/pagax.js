@@ -154,8 +154,13 @@ pagax_modules.pagax = pagax_modules.pagax || {
     },
 
     navigation_callback : function(parameters) {
-        parameters.page.title = parameters.title;
         parameters.previous['next'] = parameters.page;
+
+        if (parameters.title) {
+            parameters.page.title = parameters.title;
+        } else {
+            parameters.title = parameters.page.title;
+        }
 
         if(parameters.data.hasOwnProperty("replace_url")) {
             parameters.previous.url = parameters.data.replace_url;

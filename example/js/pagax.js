@@ -24,7 +24,7 @@ pagax_modules.ajax = pagax_modules.ajax || {
         var timeout = 60000;
 
         if(parameters.hasOwnProperty("timeout")) {
-            var timeout = parameters.hasOwnProperty("timeout");
+            var timeout = parameters.timeout;
         } else if(pagax_modules.settings.hasOwnProperty("ajax") && pagax_modules.settings.ajax.hasOwnProperty("timeout")) {
             timeout = pagax_modules.settings.ajax.timeout;
         }
@@ -824,8 +824,13 @@ pagax_modules.pagax = pagax_modules.pagax || {
     },
 
     navigation_callback : function(parameters) {
-        parameters.page.title = parameters.title;
         parameters.previous['next'] = parameters.page;
+
+        if (parameters.title) {
+            parameters.page.title = parameters.title;
+        } else {
+            parameters.title = parameters.page.title;
+        }
 
         if(parameters.data.hasOwnProperty("replace_url")) {
             parameters.previous.url = parameters.data.replace_url;
